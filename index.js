@@ -8,7 +8,6 @@
 //   𝑺𝒂𝒆𝒆𝒅 𝑩𝒐𝒕 🛡️ - ربط عبر رقم الهاتف
 // ====================================================
 
-cat > index.js << 'EOF'
 require('dotenv').config();
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const { Boom } = require('@hapi/boom');
@@ -53,7 +52,3 @@ async function startBot() {
       else startBot();
     }
   });
-}
-
-startBot();
-EOF
