@@ -8,46 +8,37 @@
 //   𝑺𝒂𝒆𝒆𝒅 𝑩𝒐𝒕 🛡️ - ربط عبر رقم الهاتف
 // ====================================================
 
-const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const pino = require('pino');
-const crypto = require('crypto');
-const http = require('http'); // مكتبة ضرورية لـ Render
-
-// إنشاء سيرفر بسيط لإيهام Render أن الخدمة تعمل
-http.createServer((req, res) => {
-    res.write('Saeed Bot is Running!');
-    res.end();
-}).listen(process.env.PORT || 3000);
+const { Pastebin } = require('pastebin-js'); // أو الطريقة اللي استخرجت بها السشن
 
 async function startSaeedBot() {
-    const { state, saveCreds } = await useMultiFileAuthState('./session_render');
+    // هنا الكود سيبحث عن SESSION_ID في إعدادات GitHub
+    const sessionID = process.env.SESSION_ID; 
+
+    const { state, saveCreds } = await useMultiFileAuthState('./session');
     const { version } = await fetchLatestBaileysVersion();
 
     const sock = makeWASocket({
         version,
-        auth: {
-            creds: state.creds,
-            keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
-        },
+        auth: state,
         logger: pino({ level: 'silent' }),
-        browser: ["Saeed Render Bot", "Chrome", "1.0.0"]
+        browser: ["Saeed_Bot", "Chrome", "1.0.0"]
     });
 
-    if (!sock.authState.creds.registered) {
-        const myNumber = "967770179625"; 
-        setTimeout(async () => {
-            try {
-                let code = await sock.requestPairingCode(myNumber);
-                code = code?.match(/.{1,4}/g)?.join("-") || code;
-                console.log("\n" + "=".repeat(30));
-                console.log("✅ كود الربط لـ Render هو: " + code);
-                console.log("=".repeat(30) + "\n");
-            } catch (err) { console.log("خطأ: " + err.message); }
-        }, 8000);
-    }
-
+    // إذا كان السشن موجود، سيتصل مباشرة
     sock.ev.on('creds.update', saveCreds);
 
+    sock.ev.on('connection.update', (update) => {
+        const { connection } = update;
+        if (connection === 'open') {
+            console.log('🚀 مبروك يا سعيد! البوت متصل الآن باستخدام الـ Session.');
+        } else if (connection === 'close') {
+            startSaeedBot();
+        }
+    });
+
+    // أوامر البوت
     sock.ev.on('messages.upsert', async ({ messages }) => {
         const msg = messages[0];
         if (!msg.message || msg.key.fromMe) return;
@@ -55,14 +46,8 @@ async function startSaeedBot() {
         const text = msg.message.conversation || msg.message.extendedTextMessage?.text || "";
 
         if (text === '.قائمة') {
-            await sock.sendMessage(from, { text: '🌟 هلا سعيد! البوت شغال الآن من سيرفر ريندر بنجاح.' });
+            await sock.sendMessage(from, { text: '🌟 أهلاً سعيد! البوت شغال بالـ Session ID بنجاح.' });
         }
-    });
-
-    sock.ev.on('connection.update', (update) => {
-        const { connection } = update;
-        if (connection === 'open') console.log('🚀 البوت متصل ومستقر على ريندر!');
-        else if (connection === 'close') startSaeedBot();
     });
 }
 
