@@ -19,34 +19,34 @@ async function startSaeedBot() {
         auth: state,
         version,
         logger: pino({ level: 'silent' }),
-        // تغيير الهوية إلى Safari على Mac لضمان توافق حسابات الأعمال
-        browser: Browsers.macOS('Desktop'), 
-        syncFullHistory: false, // لتقليل الضغط وتلقي الرسائل الجديدة فوراً
-        markOnlineOnConnect: true
+        browser: Browsers.macOS('Desktop'),
+        syncFullHistory: false
     });
 
     sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', ({ connection, lastDisconnect }) => {
+    sock.ev.on('connection.update', ({ connection }) => {
         if (connection === 'open') {
-            console.log('✅ تم الاتصال بنجاح (وضع حساب الأعمال)');
-            console.log('📡 في انتظار أول رسالة الآن...');
+            console.log('✅ البوت جاهز تماماً!');
         } else if (connection === 'close') {
-            startSaeedBot();
+            setTimeout(startSaeedBot, 5000); // إعادة محاولة بعد 5 ثوانٍ إذا انقطع الاتصال
         }
     });
 
-    sock.ev.on('messages.upsert', async ({ messages }) => {
+    sock.ev.on('messages.upsert', async ({ messages, type }) => {
+        if (type !== 'notify') return;
         const msg = messages[0];
         if (!msg.message || msg.key.fromMe) return;
-        
-        const from = msg.key.remoteJid;
+
+        // تجاهل رسائل القنوات لتجنب الانهيار
+        if (msg.key.remoteJid.includes('@newsletter')) return;
+
         const text = msg.message.conversation || msg.message.extendedTextMessage?.text || "";
-
-        console.log(`📩 وصلت رسالة من ${from}: ${text}`);
-
-        // رد سريع للتجربة
-        await sock.sendMessage(from, { text: 'وصلت رسالتك يا بطل! البوت شغال ✅' });
+        
+        // الرد فقط على كلمة .فحص
+        if (text === '.فحص') {
+            await sock.sendMessage(msg.key.remoteJid, { text: 'البوت شغال يا سعيد! ✅' });
+        }
     });
 }
 startSaeedBot();
