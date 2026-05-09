@@ -7,28 +7,9 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "@google/generative-ai": "0.11.0",
     "@whiskeysockets/baileys": "^6.7.16",
-    "@google/generative-ai": "latest",
-    "@hapi/boom": "^10.0.1",
-    "axios": "^1.6.0",
-    "chalk": "^4.1.2",
-    "dotenv": "^16.3.1",
-    "file-type": "^16.5.4",
-    "fluent-ffmpeg": "^2.1.2",
-    "fs-extra": "^11.2.0",
-    "jimp": "^1.6.0", 
-    "libphonenumber-js": "^1.10.53",
-    "moment": "^2.29.4",
-    "node-cache": "^5.1.2",
-    "pino": "^8.17.2",
-    "qrcode-terminal": "^0.12.0",
-    "sharp": "^0.33.2",
-    "yt-search": "^2.10.4",
-    "node-fetch": "^2.7.0",
-    "cheerio": "^1.0.0-rc.12",
-    "express": "^4.18.2",
-    "qrcode": "^1.5.3",
-    "crypto": "^1.0.1",
-    "translate": "^1.4.1"
+    "pino": "latest",
+    "chalk": "^4.1.2"
   }
 }
