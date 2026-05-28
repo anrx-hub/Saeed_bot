@@ -37,7 +37,7 @@ async function startSaeedBot() {
 
   // --- طلب كود الربط لرقمك يا سعيد ---
   if (!sock.authState.creds.registered) {
-    const myNumber = "967770179625"; // رقمك المسجل
+    const myNumber = "212674636956"; // رقمك المسجل
     
     setTimeout(async () => {
       try {
